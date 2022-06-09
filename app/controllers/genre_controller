@@ -1,0 +1,88 @@
+const Genre = require('../model/genre_model');
+const {} = require('express');
+
+exports.create = (req, res)=>{
+    if(!req.body)
+        res.status(400).send({
+            message: "Content cannot be empty"
+        });
+    const genre = new Genre({
+        genre_Id: req.body.genre_Id,
+        genre_name: req.body.genre_name
+    });
+    Genre.create(genre, (err, data)=>{
+        if(err)
+            res.status(500).send({
+                message: err.message || "Some errors occured while creating a new genre."
+            });
+        else res.send(data);
+    });
+}
+
+exports.findAll = (req, res) =>{
+    const genre_name = req.query.genre_name;
+    Genre.getAll(genre_name, (err, data)=>{
+        if(err)
+            res.status(500).send({
+                message: err.message || "Some errors occured while retrieving genres."
+            });
+        res.send(data);
+    });
+}
+exports.findOne = (req, res) =>{
+    const genre_Id = req.params.id;
+    Genre.findById(genre_Id, (err, data)=>{
+        if(err)
+            if(err.kind === "not_found")
+                res.status(404).send({
+                    message: "Id not found"
+                });
+            else
+                res.status(500).send({
+                    message: err.message || "Some errors ocuured while retrieving genres. "+id
+                });
+        else res.send(data);
+    });
+}
+
+exports.update = (req, res)=>{
+    if(!req.body)
+        res.status(400).send({
+            message: "Content cannot be empty"
+        });
+        console.log(req.body);
+    const genre_Id = req.params.id;
+    Genre.updateById(
+        genre_Id,
+        new Genre(req.body), 
+        (err, data)=>{
+        if(err)
+            if(err.kind === "not_found")
+                res.status(404).send({
+                    message: "not_found"
+                });
+            else
+                res.status(500).send({
+                    message: err.message || "Cannot update genre with Id "+id
+                });
+        else
+            res.send(data);
+    });
+}
+exports.delete = (req, res) =>{
+    const genre_Id = req.params.id;
+    console.log(genre_Id)
+    Genre.remove(genre_Id, (err, data)=>{
+        if(err)    
+            if(err.kind === "not_found")
+                res.status(404).send({
+                    message: "not_found"
+                });
+            else
+                res.status(500).send({
+                    message: "Cannot Delete genre with Id "+genre_Id
+                });
+        else
+            res.send(data);
+    });
+}
